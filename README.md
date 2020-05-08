@@ -1,1 +1,1 @@
-# Toolkit built to analysis FLASH data
+# Toolkit built for analyzing FLASH data
