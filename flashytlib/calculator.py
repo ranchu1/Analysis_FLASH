@@ -1,15 +1,16 @@
 # --- fun [ read zeroth moment J(e) and integrate ] --- #
-def ReadMoment_Zeroth( filename ):
+def ReadMoment_Zeroth( filename, Dir ):
     # read moment J from chk as a functionn of energy
     import numpy as np
     import flashytlib.io as fyio
+    import flashytlib.io_basis as fyiobasis
     import flashytlib.calculator as fycal
 
     nNodeE = 2 # default and only avaliable @ Mar.20
     # read in chk and determine nPointsE
     nPointsE = 0
- 
     nPointsE = int(fyio.IO_FLASH_nPointsE( filename ))
+    [eL, eR, zoomE] = fyiobasis.IO_CheckESetting(Dir+'/flash.par',False)
     Radius   = fyio.IO_FLASH_1D_1Var( filename,'r_cm', False )
     nPointsX = len(Radius)
     J_PhaseSpace_Nodes = np.zeros([nPointsX,nPointsE*nNodeE])
@@ -25,8 +26,8 @@ def ReadMoment_Zeroth( filename ):
     NumberDensity = np.zeros([nPointsX])
     EnergyDensity = np.zeros([nPointsX])
     # default Energy Grid setting
-    xL = 0.; xR = 300.; Zoom = 1.0748700581781865 # nE = 40
-    [Ecenter, Ewidth, Enodes] = fycal.CreateGeometricMesh( nPointsE, nNodeE, xL, xR, Zoom)
+    
+    [Ecenter, Ewidth, Enodes] = fycal.CreateGeometricMesh( nPointsE, nNodeE, eL, eR, zoomE)
     
     const = 4.0 * np.pi
     for ix in range(nPointsX):
@@ -40,17 +41,19 @@ def ReadMoment_Zeroth( filename ):
     return( NumberDensity, EnergyDensity, AverageEnergy, J_PhaseSpace_SubCE, Ecenter, Radius )
 
 # --- fun [ read first moment H1(e) and integrate ] --- #
-def ReadMoment_First( filename ):
+def ReadMoment_First( filename, Dir ):
     # read moment H1 from chk as a functionn of energy
     import numpy as np
     import flashytlib.io as fyio
+    import flashytlib.io_basis as fyiobasis
     import flashytlib.calculator as fycal
 
     nNodeE = 2 # default and only avaliable @ Mar.20
     # read in chk and determine nPointsE
     nPointsE = 0
-
     nPointsE = int(fyio.IO_FLASH_nPointsE( filename ))
+    [eL, eR, zoomE] = fyiobasis.IO_CheckESetting(Dir+'/flash.par', False)
+    
     Radius   = fyio.IO_FLASH_1D_1Var( filename,'r_cm', False )
     nPointsX = len(Radius)
     H1_PhaseSpace_Nodes = np.zeros([nPointsX,nPointsE*nNodeE])
@@ -64,9 +67,8 @@ def ReadMoment_First( filename ):
             H1_PhaseSpace_SubCE[ix,ie] = fycal.CellAve_Gaussian( H1_PhaseSpace_Nodes[ix,ie*nNodeE:ie*nNodeE+2] )
 
     Luminosity = np.zeros([nPointsX])
-    # default Energy Grid setting
-    xL = 0.; xR = 300.; Zoom = 1.0748700581781865 # nE = 40
-    [Ecenter, Ewidth, Enodes] = fycal.CreateGeometricMesh( nPointsE, nNodeE, xL, xR, Zoom)
+
+    [Ecenter, Ewidth, Enodes] = fycal.CreateGeometricMesh( nPointsE, nNodeE, eL, eR, zoomE)
 
     const = 4.0 * np.pi
     for ix in range(nPointsX):

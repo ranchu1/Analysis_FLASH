@@ -41,3 +41,32 @@ def IO_CheckFile( Dir, Verbose=False ):
             print(f)
 
     return( filelist ) 
+
+# --- search parameter files for energy setting -- #
+def IO_CheckESetting( filename, Verbose=False):
+    """ search parfile for eR, eL and zoomE
+    need parfilename as input """
+    import os.path
+
+    if os.path.isfile(filename):
+        print ("File exist")
+        f = open(filename)
+        info = f.readlines()
+        for i in info:
+            if (i[0:5] == 'rt_eL'):
+                eL = float(i.split()[2])
+                if (Verbose) :
+                    print(i,' => eL = ',eL)
+            if (i[0:5] == 'rt_eR'):
+                eR = float(i.split()[2])
+                if (Verbose) :
+                    print(i,' => eR = ',eR)
+            if (i[0:8] == 'rt_zoomE'):
+                zoomE = float(i.split()[2])
+                if (Verbose) :
+                    print(i,' => zoomE = ',zoomE)
+        f.close()
+    else:
+        print ("File not exist")
+
+    return( eL, eR, zoomE )
