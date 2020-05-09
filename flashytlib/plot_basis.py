@@ -1,4 +1,4 @@
-def plt_Eos_DTY( r, D, T, Y ):
+def plt_Eos_DTY( r, D, T, Y, optional_title ):
     # plot 1D density-temperature-electron fraction data
     import matplotlib.pyplot as plt
 
@@ -10,6 +10,7 @@ def plt_Eos_DTY( r, D, T, Y ):
     ax1.set_ylabel('Density [g cm-3] / Temperature [K]', color=color)
     lns1 = ax1.plot(r, D, color=color, label='Density')
     ax1.set_yscale('log')
+    ax1.set_xscale('log')
     ax1.tick_params(axis='y', labelcolor=color)
     # --- temperature
     color = 'tab:green'
@@ -24,6 +25,7 @@ def plt_Eos_DTY( r, D, T, Y ):
     lns = lns1 + lns2 + lns3
     labs = [l.get_label() for l in lns]
     ax1.legend(lns, labs, loc='right')
+    ax1.set_title(optional_title)
 
     plt.show()
     

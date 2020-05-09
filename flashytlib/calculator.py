@@ -1,5 +1,5 @@
 # --- fun [ read zeroth moment J(e) and integrate ] --- #
-def ReadMoment_Zeroth( filename, Dir ):
+def ReadMoment_Zeroth( filename, Dir, iSpecies=1 ):
     # read moment J from chk as a functionn of energy
     import numpy as np
     import flashytlib.io as fyio
@@ -17,7 +17,7 @@ def ReadMoment_Zeroth( filename, Dir ):
     J_PhaseSpace_SubCE = np.zeros([nPointsX,nPointsE])
     J_str = nPointsE*nNodeE *['']
     for i in range(nPointsE*nNodeE):
-        J_str[i] = 't'+'{:03d}'.format(i+1)
+        J_str[i] = 't'+'{:03d}'.format(i+1+(nPointsE*nNodeE)*4*(iSpecies-1))
         J_PhaseSpace_Nodes[:,i] = fyio.IO_FLASH_1D_1Var( filename,J_str[i], False )
     for ix in range(nPointsX):
         for ie in range(nPointsE):
@@ -41,7 +41,7 @@ def ReadMoment_Zeroth( filename, Dir ):
     return( NumberDensity, EnergyDensity, AverageEnergy, J_PhaseSpace_SubCE, Ecenter, Radius )
 
 # --- fun [ read first moment H1(e) and integrate ] --- #
-def ReadMoment_First( filename, Dir ):
+def ReadMoment_First( filename, Dir, iSpecies=1 ):
     # read moment H1 from chk as a functionn of energy
     import numpy as np
     import flashytlib.io as fyio
@@ -60,22 +60,24 @@ def ReadMoment_First( filename, Dir ):
     H1_PhaseSpace_SubCE = np.zeros([nPointsX,nPointsE])
     H1_str = nPointsE*nNodeE *['']
     for i in range(nPointsE*nNodeE):
-        H1_str[i] = 't'+'{:03d}'.format(i+1+nPointsE*nNodeE)
+        H1_str[i] = 't'+'{:03d}'.format(i+1+nPointsE*nNodeE+(nPointsE*nNodeE)*4*(iSpecies-1))
         H1_PhaseSpace_Nodes[:,i] = fyio.IO_FLASH_1D_1Var( filename,H1_str[i], False )
     for ix in range(nPointsX):
         for ie in range(nPointsE):
             H1_PhaseSpace_SubCE[ix,ie] = fycal.CellAve_Gaussian( H1_PhaseSpace_Nodes[ix,ie*nNodeE:ie*nNodeE+2] )
 
-    Luminosity = np.zeros([nPointsX])
+    Luminosity  = np.zeros([nPointsX])
+    FluxDensity = np.zeros([nPointsX])
 
     [Ecenter, Ewidth, Enodes] = fycal.CreateGeometricMesh( nPointsE, nNodeE, eL, eR, zoomE)
 
     const = 4.0 * np.pi
     for ix in range(nPointsX):
-        Luminosity[ix] = const * fycal.TrapezoidalIntegral( Ecenter, H1_PhaseSpace_SubCE[ix], 3. )
+        FluxDensity[ix] = const * fycal.TrapezoidalIntegral( Ecenter, H1_PhaseSpace_SubCE[ix], 3. )
         # 3. => energy ** 3
+        Luminosity[ix] = const * Radius[ix] * Radius[ix] * FluxDensity[ix]
 
-    return( Luminosity, H1_PhaseSpace_SubCE, Ecenter, Radius )
+    return( FluxDensity, Luminosity, H1_PhaseSpace_SubCE, Ecenter, Radius )
 
 # --- fun [ create mesh ] --- #    
 def CreateMesh( N, nN, SW, xL, xR, ZoomOption=1.0 ):

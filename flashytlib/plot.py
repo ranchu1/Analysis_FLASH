@@ -76,7 +76,7 @@ def plt_1D_Eos( filename, optional_title='' ):
         var_data[ivar] = buffdata
         ivar = ivar + 1
 
-    fypltb.plt_Eos_DTY( var_data[0], var_data[1], var_data[2], var_data[3] )        
+    fypltb.plt_Eos_DTY( var_data[0], var_data[1], var_data[2], var_data[3], optional_title )        
 
 
 # --- fun [ Number Density plot ] --- #

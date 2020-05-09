@@ -49,7 +49,6 @@ def IO_CheckESetting( filename, Verbose=False):
     import os.path
 
     if os.path.isfile(filename):
-        print ("File exist")
         f = open(filename)
         info = f.readlines()
         for i in info:
