@@ -1,5 +1,29 @@
+def IO_AssembleFileName( directory, namebase, indexes ):
+    """
+    Option 1: one directory, one namebase and multiple indexes
+    Option 2: one namebase, N directories and N indexes
+    """
+    numdir   = len(directory)
+    numindex = len(indexes)
+    if( numdir == numindex ):
+      filenames = ['?'] * numindex
+      for i in range(numindex):
+         filenames[i] = directory[i] + namebase + '{:04d}'.format(indexes[i])
+      return( numindex, filenames )
+    elif ( numdir == 1 ):
+      filenames = ['?'] * numindex
+      for i in range(numindex):
+         filenames[i] = directory[0] + namebase + '{:04d}'.format(indexes[i])
+      return( numindex, filenames )
+    else:
+      print('unable to understand the inputs')
+
 def IO_FLASHStandardProfile( filename ):
-    # reader for FLASH5 standard profile
+    """ dens-temp-ye reader for FLASH5 standard profile
+        assumed 1D in data structure
+        input:  filename
+        output: radius, dens, temp, ye
+    """
     import numpy as np
 
     print('Reading ', filename, ' ...')
@@ -44,8 +68,11 @@ def IO_CheckFile( Dir, Verbose=False ):
 
 # --- search parameter files for energy setting -- #
 def IO_CheckESetting( filename, Verbose=False):
-    """ search parfile for eR, eL and zoomE
-    need parfilename as input """
+    """ search a parfile name 'filename' for eR, eL and zoomE
+        assumed 'rt_eL', 'rt_eR', 'rt_zoomE' exist
+        input  : filename
+        output : eL, eR, zoomE
+     """
     import os.path
 
     if os.path.isfile(filename):
