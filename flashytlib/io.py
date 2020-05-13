@@ -1,3 +1,48 @@
+def IO_GetMoments_n_ComputeMeanVars( filenames, directories, nSpecies ):
+    """
+    assumed 1D data, N filename = N directory
+    input  : filenames, directories, nSpecies
+    output : Energy, Radius, 
+             ZerothMoment, FirstMoment, 
+             NumberDensity, EnergyDensity, FluxDensity, 
+             AverageEnergy, AverageFluxFactor, Luminosity
+    """
+    import flashytlib.calculator as fycal
+    import numpy as np
+
+    if( len(filenames) != len(directories) ):
+        print('ERROR! Need number of directories = number of filenames ')
+        return
+    else:
+        fnum = len(filenames)
+
+    Energy            = fnum * ['?']
+    Radius            = fnum * ['?']
+    ZerothMoment      = fnum * [ nSpecies * ['?'] ]
+    FirstMoment       = fnum * [ nSpecies * ['?'] ]
+    NumberDensity     = fnum * [ nSpecies * ['?'] ]
+    EnergyDensity     = fnum * [ nSpecies * ['?'] ]
+    FluxDensity       = fnum * [ nSpecies * ['?'] ]
+    AverageEnergy     = fnum * [ nSpecies * ['?'] ]
+    AverageFluxFactor = fnum * [ nSpecies * ['?'] ]
+    Luminosity        = fnum * [ nSpecies * ['?'] ]
+
+    for ifile in range(fnum):
+        print(filenames[ifile])
+        for iS in range(nSpecies):
+            [ NumberDensity[ifile][iS], EnergyDensity[ifile][iS], \
+              AverageEnergy[ifile][iS], ZerothMoment[ifile][iS], \
+              Energy[ifile], Radius[ifile] ] \
+            = fycal.ReadMoment_Zeroth(filenames[ifile], directories[ifile], iSpecies=iS+1)
+            [ FluxDensity[ifile][iS], Luminosity[ifile][iS], \
+              FirstMoment[ifile][iS], Energy[ifile], Radius[ifile] ] \
+            = fycal.ReadMoment_First(filenames[ifile], directories[ifile], iSpecies=iS+1)
+            AverageFluxFactor[ifile][iS] \
+            = np.true_divide(FluxDensity[ifile][iS],EnergyDensity[ifile][iS])
+
+    return( Energy, Radius, ZerothMoment, FirstMoment, NumberDensity, EnergyDensity, \
+            FluxDensity, AverageEnergy, AverageFluxFactor, Luminosity )
+
 # --- fun [ check files under directory ] --- #
 def IO_CheckWeaklibFile( Dir, Verbose=False ):
     import flashytlib.io_basis as fyiob
@@ -27,8 +72,11 @@ def IO_CheckWeaklibFile( Dir, Verbose=False ):
         
 # --- fun [ determine nPointsE ] --- #
 def IO_FLASH_nPointsE( filename ):
-    # give the list of unk in a FLASH chk file
-    # and nPointsE
+    """ gives the nPointsE in the checkpoint file
+    assumed nNodeX = nNodeE = 2, nSpecies = 2
+    input  : filename
+    output : nPointsE
+    """
     import h5py
 
     encoding = 'utf-8'
@@ -48,17 +96,30 @@ def IO_FLASH_nPointsE( filename ):
     return( thornado_var_num/16 )
 
 # ------------------------------------------------------------
-def IO_FLASH_Time( filename ):
-    ## read time
+def IO_FLASH_Time( filenames ):
+    """ return files' time
+    input  : filenames
+    output : f_time
+    """
     import h5py
 
-    f = h5py.File(filename, 'r')
-    real_scalars = f['real scalars']
-    f_time = real_scalars[0][1]
-    return( f_time )
+    numfile = len(filenames)
+    times = ['?'] * numfile
+    for i in range(numfile):
+       f = h5py.File(filenames[i], 'r')
+       real_scalars = f['real scalars']
+       f_time   = real_scalars[0][1]
+       f_time   = float(f_time)
+       times[i] = f_time
+
+    return( times )
 
 # ------------------------------------------------------------
 def IO_FLASH_1D_1Var( filename, str_var, Verbose ):
+    """
+    input  : filename, str variablename
+    output : variable data
+    """
     import h5py
     import numpy as np
     import matplotlib.pyplot as plt
