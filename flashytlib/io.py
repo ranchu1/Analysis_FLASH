@@ -67,6 +67,7 @@ def IO_GetMoments_n_ComputeMeanVars( filenames, directories, nSpecies ):
             Radius.append(Rad1)
             NumberDensity.append(NumDen2)
             EnergyDensity.append(EneDen2)
+            AverageEnergy.append(AveEng2)
             ZerothMoment.append(ZerMom2)
             FluxDensity.append(FluDen2)
             Luminosity.append(Lum2)
