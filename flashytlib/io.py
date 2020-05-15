@@ -8,6 +8,7 @@ def IO_GetMoments_n_ComputeMeanVars( filenames, directories, nSpecies ):
              AverageEnergy, AverageFluxFactor, Luminosity
     """
     import flashytlib.calculator as fycal
+    import flashytlib.io as fyio
     import numpy as np
 
     if( len(filenames) != len(directories) ):
@@ -16,32 +17,70 @@ def IO_GetMoments_n_ComputeMeanVars( filenames, directories, nSpecies ):
     else:
         fnum = len(filenames)
 
-    Energy            = fnum * ['?']
-    Radius            = fnum * ['?']
-    ZerothMoment      = fnum * [ nSpecies * ['?'] ]
-    FirstMoment       = fnum * [ nSpecies * ['?'] ]
-    NumberDensity     = fnum * [ nSpecies * ['?'] ]
-    EnergyDensity     = fnum * [ nSpecies * ['?'] ]
-    FluxDensity       = fnum * [ nSpecies * ['?'] ]
-    AverageEnergy     = fnum * [ nSpecies * ['?'] ]
-    AverageFluxFactor = fnum * [ nSpecies * ['?'] ]
-    Luminosity        = fnum * [ nSpecies * ['?'] ]
-
-    for ifile in range(fnum):
-        print(filenames[ifile])
+    Times = fyio.IO_FLASH_Time(filenames)
+  
+    # first file read in
+    for ifi in range(fnum):
         for iS in range(nSpecies):
-            [ NumberDensity[ifile][iS], EnergyDensity[ifile][iS], \
-              AverageEnergy[ifile][iS], ZerothMoment[ifile][iS], \
-              Energy[ifile], Radius[ifile] ] \
-            = fycal.ReadMoment_Zeroth(filenames[ifile], directories[ifile], iSpecies=iS+1)
-            [ FluxDensity[ifile][iS], Luminosity[ifile][iS], \
-              FirstMoment[ifile][iS], Energy[ifile], Radius[ifile] ] \
-            = fycal.ReadMoment_First(filenames[ifile], directories[ifile], iSpecies=iS+1)
-            AverageFluxFactor[ifile][iS] \
-            = np.true_divide(FluxDensity[ifile][iS],EnergyDensity[ifile][iS])
+            
+            [NumDen1, EneDen1, AveEng1, ZerMom1, Ene1, Rad1] \
+            = fycal.ReadMoment_Zeroth(filenames[ifi], directories[ifi], iSpecies=iS+1)
+            
+            [FluDen1, Lum1, FirMom1, Ene1, Rad1 ] \
+            = fycal.ReadMoment_First(filenames[ifi], directories[ifi], iSpecies=iS+1)
 
-    return( Energy, Radius, ZerothMoment, FirstMoment, NumberDensity, EnergyDensity, \
-            FluxDensity, AverageEnergy, AverageFluxFactor, Luminosity )
+            AveFlu1 = np.true_divide(FluDen1,EneDen1)
+
+            if(iS == 0) : # make a list if not
+                NumDen2 = [NumDen1]
+                EneDen2 = [EneDen1]
+                AveEng2 = [AveEng1]
+                ZerMom2 = [ZerMom1]
+                FluDen2 = [FluDen1]
+                Lum2    = [Lum1]
+                FirMom2 = [FirMom1]
+                AveFlu2 = [AveFlu1]
+                
+            if (iS == 1 ): # add an element to list
+                NumDen2.append(NumDen1)
+                EneDen2.append(EneDen1)
+                AveEng2.append(AveEng1)
+                ZerMom2.append(ZerMom1)
+                FluDen2.append(FluDen1)
+                Lum2.append(Lum1)
+                FirMom2.append(FirMom1)
+                AveFlu2.append(AveFlu1)
+                
+        if( ifi == 0 ):
+            Energy = [Ene1]
+            Radius = [Rad1]
+            NumberDensity = [NumDen2]
+            EnergyDensity = [EneDen2]
+            AverageEnergy = [AveEng2]
+            ZerothMoment  = [ZerMom2]
+            FluxDensity   = [FluDen2]
+            Luminosity    = [Lum2]
+            FirstMoment   = [FirMom2]
+            AverageFluxFactor = [AveFlu2]
+        else:
+            Energy.append(Ene1)
+            Radius.append(Rad1)
+            NumberDensity.append(NumDen2)
+            EnergyDensity.append(EneDen2)
+            ZerothMoment.append(ZerMom2)
+            FluxDensity.append(FluDen2)
+            Luminosity.append(Lum2)
+            FirstMoment.append(FirMom2)
+            AverageFluxFactor.append(AveFlu2)
+
+    print('shape Times  [nfum]',np.shape(Times))
+    print('shape Energy [nfum,nE]',np.shape(Energy))
+    print('shape Radius [nfum,nR]',np.shape(Radius))
+    print('shape NumbDe [nfum,nS,nR]',np.shape(NumberDensity))
+    print('shape Moment [nfum,nS,nR,nE]',np.shape(ZerothMoment))
+    
+    return( Times, Energy, Radius, ZerothMoment, FirstMoment, NumberDensity, \
+           EnergyDensity, FluxDensity, AverageEnergy, AverageFluxFactor, Luminosity )
 
 # --- fun [ check files under directory ] --- #
 def IO_CheckWeaklibFile( Dir, Verbose=False ):
@@ -192,3 +231,4 @@ def IO_FLASH_1D_1Var( filename, str_var, Verbose ):
 # ------------------------------------------------------------
 def IO_FLASH_1D_VarArr( ):
     print('Nothing')
+    
