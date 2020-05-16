@@ -78,7 +78,7 @@ def IO_GetMoments_n_ComputeMeanVars( filenames, directories, nSpecies ):
     print('shape Energy [nfum,nE]',np.shape(Energy))
     print('shape Radius [nfum,nR]',np.shape(Radius))
     print('shape NumbDe [nfum,nS,nR]',np.shape(NumberDensity))
-    print('shape Moment [nfum,nS,nR,nE]',np.shape(ZerothMoment))
+    #print('shape Moment [nfum,nS,nR,nE]',np.shape(ZerothMoment))
     
     return( Times, Energy, Radius, ZerothMoment, FirstMoment, NumberDensity, \
            EnergyDensity, FluxDensity, AverageEnergy, AverageFluxFactor, Luminosity )
