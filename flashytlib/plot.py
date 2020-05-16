@@ -79,7 +79,7 @@ def plt_1D_Eos( filename, optional_title='' ):
     fypltb.plt_Eos_DTY( var_data[0], var_data[1], var_data[2], var_data[3], optional_title )        
 
     # --- fun [ Eos plot ] --- #
-def plt_1D_Eos_multi( filenames, optional_title='' ):
+def plt_1D_Eos_multi( filenames, optional_title='', optional_legend = ''):
     import flashytlib.io as fyio
     import matplotlib.pyplot as plt
     import flashytlib.plot_basis as fypltb
@@ -102,7 +102,8 @@ def plt_1D_Eos_multi( filenames, optional_title='' ):
                        var_data[nfile:2*nfile], \
                        var_data[2*nfile:3*nfile],\
                        var_data[3*nfile:4*nfile], \
-                       optional_title, nfile = nfile ) 
+                       optional_title, nfile = nfile, \
+                       optional_legend = optional_legend ) 
 
 # --- fun [ Number Density plot ] --- #
 def plt_1D_NumberDensity( filename ):
