@@ -105,6 +105,40 @@ def plt_1D_Eos_multi( filenames, optional_title='', optional_legend = ''):
                        optional_title, nfile = nfile, \
                        optional_legend = optional_legend ) 
 
+# --- fun [ Eos plot ] --- #
+def pltio_1D_Eos_multi( filenames, optional_title='', optional_legend = ''):
+    import flashytlib.io as fyio
+    import matplotlib.pyplot as plt
+    import flashytlib.plot_basis as fypltb
+    
+    # loading density, temperature, electron fraction
+    nfile = len(filenames)
+    plotvariables = ['r_cm','dens','temp','ye  ']
+    nvar  = len(plotvariables) * nfile
+    var_data = nvar * ['?']
+    ivar = 0
+    
+    for var_name in plotvariables:
+        for ifile in range(nfile):
+            buffdata = fyio.IO_FLASH_1D_1Var(filenames[ifile], var_name, Verbose=False)
+            var_data[ivar] = buffdata
+            ivar = ivar + 1
+    
+    fypltb.plt_Eos_DTY( \
+                       var_data[0:nfile], \
+                       var_data[nfile:2*nfile], \
+                       var_data[2*nfile:3*nfile],\
+                       var_data[3*nfile:4*nfile], \
+                       optional_title, nfile = nfile, \
+                       optional_legend = optional_legend )
+    
+    radius = var_data[0:nfile]
+    dens   = var_data[nfile:2*nfile]
+    temp   = var_data[2*nfile:3*nfile]
+    ye     = var_data[3*nfile:4*nfile]
+    
+    return( radius, dens, temp, ye )
+ 
 # --- fun [ Number Density plot ] --- #
 def plt_1D_NumberDensity( filename ):
     # plot number density N
